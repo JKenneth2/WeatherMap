@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather and Maps</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Google Maps and Weather</h1>
+        <form method="POST">
+            <label for="city">Enter City:</label>
+            <input type="text" id="city" name="city" required placeholder="e.g., Manila">
+            <button type="submit">Get Weather</button>
+        </form>
+
+        {% if weather %}
+            <div class="weather-info">
+                <h2>Weather in {{ city }}</h2>
+                <p>Temperature: {{ weather.temperature }}°C</p>
+                <p>Description: {{ weather.description }}</p>
+                <img src="http://openweathermap.org/img/wn/{{ weather.icon }}.png" alt="Weather Icon">
+            </div>
+
+            <h2>Location on Map</h2>
+            <div id="map"></div>
+            <script>
+                function initMap() {
+                    const location = { 
+                        lat: parseFloat("{{ weather.lat | safe }}"), 
+                        lng: parseFloat("{{ weather.lon | safe }}") 
+                    };
+                    const map = new google.maps.Map(document.getElementById("map"), {
+                        zoom: 10,
+                        center: location,
+                    });
+                    new google.maps.Marker({
+                        position: location,
+                        map: map,
+                    });
+                }
+            </script>
+            
+            <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap">
+            </script>
+        {% else %}
+            <p class="error-message">Enter a city to see the weather and location on the map.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
